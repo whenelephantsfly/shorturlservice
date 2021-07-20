@@ -1,0 +1,10 @@
+REFERENCE LINKS:
+
+System Design : Design a service like TinyUrl - https://youtu.be/fMZMm_0ZhK4
+
+OneSlashNinja/TinyUrl - https://github.com/OneSlashNinja/TinyUrl
+
+How to design a tiny URL or URL shortener? - GeeksforGeeks - https://www.geeksforgeeks.org/how-to-design-a-tiny-url-or-url-shortener/
+
+Designing a URL Shortening service like TinyURL - Grokking the System Design Interview - https://www.educative.io/courses/grokking-the-system-design-interview/m2ygV4E81AR
+

@@ -1,6 +1,6 @@
 Day 0:-
 Manthan-
-	Learned about differnte algorithms that can be used to create short URL.
+	Learned about different algorithms that can be used to create short URL.
 Mukul-
 	Read about different methods to approach the problem.
 Manognya-
@@ -16,3 +16,8 @@ Mukul -
 	Project setup done on local machine. Decided to go ahead with SQL database
 Manognya - 
 	Decided with team on tech stack and design of solution, and divided the initial work; started on ER diagram.
+
+Day 2:-
+
+Manognya - 
+	Finished ER Diagram, split up project work with team, Started reading about caching with Django and MongoDB

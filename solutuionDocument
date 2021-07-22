@@ -1,0 +1,32 @@
+	• Tech Stack to use?   
+		Java (Spring)
+		Python (Django) Advantage - Has models to create login functionality.
+	• Database 
+		○ NoSQL-
+			§ MongoDB
+			§ Cassendra
+		
+	• UI
+		○ React
+	• SQL or  NoSQL?
+		○ SQL is not scalable
+		○ NoSql is scalable
+		○ SQL has consistency
+		○ NoSql has no consistency
+		
+	• Which data structure to use for storing the urls?
+		
+	
+	• Algorithm to convert original url to tiny url?
+		○ Using url hashing
+			§ After login use used ID as well 
+			§ Functionality to 
+		○ Counter using zookeeper and dividing the counter into differenet nodes
+		
+		
+	• API's ?
+		○ To generate the tiny url
+		○ To check the tiny url in databae
+		○ To redirect
+		○ To delete the row
+

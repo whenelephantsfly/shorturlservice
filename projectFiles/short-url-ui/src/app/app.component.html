@@ -1,0 +1,17 @@
+<!-- Top level Navbar -->
+<header class="header-1">
+  <div class="branding">
+    <a href="javascript://" class="nav-link">
+      <cds-icon shape="vm-bug-inverse"></cds-icon>
+      <span class="title">Short URL Service</span>
+    </a>
+  </div>
+  <div class="header-nav">
+    <a routerLink="/" [routerLinkActiveOptions]="{exact: true}" class="nav-link nav-text" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/login" class="nav-link nav-text" routerLinkActive="active">Login</a>
+  </div>
+</header>
+
+<div>
+  <router-outlet></router-outlet>
+</div>

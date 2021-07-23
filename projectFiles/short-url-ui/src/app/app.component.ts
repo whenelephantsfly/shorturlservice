@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import '@cds/core/icon/register.js';
-import { ClarityIcons, vmBugInverseIcon } from '@cds/core/icon';
+import { ClarityIcons, vmBugIcon, checkIcon } from '@cds/core/icon';
 
-ClarityIcons.addIcons(vmBugInverseIcon);
+ClarityIcons.addIcons(vmBugIcon, checkIcon);
 
 @Component({
   selector: 'app-root',

@@ -8,6 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginComponent } from './login/login.component';
 import { ConvertUrlComponent } from './convert-url/convert-url.component';
 import { AllUrlsComponent } from './all-urls/all-urls.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { AllUrlsComponent } from './all-urls/all-urls.component';
     BrowserModule,
     AppRoutingModule,
     ClarityModule,
+    FormsModule,
     BrowserAnimationsModule
   ],
   providers: [],

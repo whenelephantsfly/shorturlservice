@@ -1,0 +1,9 @@
+.flex-container {
+    display: flex;
+    justify-content: center;
+}
+
+.bg-img {
+    background-image: url('../../assets/499583-zoom-backgrounds-2.png');
+    background-position: center;
+}

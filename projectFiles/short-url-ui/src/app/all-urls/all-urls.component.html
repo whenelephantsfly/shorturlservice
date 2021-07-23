@@ -1,0 +1,17 @@
+<form class="clr-form clr-form-horizontal">
+
+    <h2>ALL URLs</h2>
+
+    <clr-datagrid style="width: 60%;">
+        <clr-dg-column [clrDgField]="'shortURL'">Short URL</clr-dg-column>
+        <clr-dg-column [clrDgField]="'originalURL'">Original URL</clr-dg-column>
+
+        <clr-dg-row *clrDgItems="let url of urls">
+            <clr-dg-cell>{{url.shortURL}}</clr-dg-cell>
+            <clr-dg-cell>{{url.originalURL}}</clr-dg-cell>
+        </clr-dg-row>
+
+        <clr-dg-footer>{{urls.length}} urls</clr-dg-footer>
+    </clr-datagrid>
+    
+</form>

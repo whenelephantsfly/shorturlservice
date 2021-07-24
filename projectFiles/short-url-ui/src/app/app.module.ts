@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { ClarityModule } from '@clr/angular';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginComponent } from './login/login.component';
+import { SignupComponent } from './signup/signup.component';
 import { ConvertUrlComponent } from './convert-url/convert-url.component';
 import { AllUrlsComponent } from './all-urls/all-urls.component';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +16,8 @@ import { FormsModule } from '@angular/forms';
     AppComponent,
     LoginComponent,
     ConvertUrlComponent,
-    AllUrlsComponent
+    AllUrlsComponent,
+    SignupComponent
   ],
   imports: [
     BrowserModule,

@@ -2,17 +2,9 @@
   <form class="login">
     <section class="title">
       <h3 class="welcome">Welcome to</h3>
-      Company Product Name
-      <h5 class="hint">Use your Company ID to sign in or create one now</h5>
-    </section>
+      Short URL Service
+      </section>
     <div class="login-group">
-      <clr-select-container>
-        <label class="clr-sr-only">User Role</label>
-        <select clrSelect name="type">
-          <option value="local">Local Users</option>
-          <option value="admin">Administrator</option>
-        </select>
-      </clr-select-container>
       <clr-input-container>
         <label class="clr-sr-only">Username</label>
         <input type="text" name="username" clrInput placeholder="Username" />
@@ -25,11 +17,12 @@
         <label>Remember me</label>
         <input type="checkbox" name="rememberMe" clrCheckbox />
       </clr-checkbox-wrapper>
-      <div class="error active">
+   <!-- <div class="error active">
         Invalid user name or password
-      </div>
-      <button type="submit" class="btn btn-primary">NEXT</button>
-      <a href="javascript://" class="signup">Sign up for a Company ID</a>
+      </div>  -->
+      <button type="submit" class="btn btn-primary">Login</button>
+      <label>Don't have an account? <a routerLink="/signup" class="nav-link nav-text" routerLinkActive="active"><u><b>Sign Up</b></u> </a>
+      </label>
     </div>
   </form>
 </div>

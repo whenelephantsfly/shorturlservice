@@ -18,12 +18,12 @@
     "@angular/platform-browser": "~12.1.0-",
     "@angular/platform-browser-dynamic": "~12.1.0-",
     "@angular/router": "~12.1.0-",
+    "@cds/core": "^5.0.0",
     "@clr/angular": "5.4.1",
+    "@clr/ui": "5.4.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.2.0",
-    "zone.js": "~0.11.4",
-    "@clr/ui": "5.4.1",
-    "@cds/core": "^5.0.0"
+    "zone.js": "~0.11.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.1.3",

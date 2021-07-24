@@ -3,9 +3,9 @@
     <h1 style="text-align: center; color: white; font-weight: bold;">Shorten a URL</h1>
     <br><br><br><br>
     <div *ngIf="responseData != {}" class="flex-container">
-        <input style="background-color: white;" placeholder="Paste a URL"
-            name="longUrl" size="180" [(ngModel)]="longUrl" />
-        <button (click)="onSubmit" class="btn btn-lg btn-primary btn-icon">
+        <input style="background-color: white; width: 800%;" placeholder="Paste a URL"
+            name="longUrl" [(ngModel)]="longUrl" />
+        <button (click)="onSubmit()" class="btn btn-lg btn-primary btn-icon">
             <cds-icon shape="check"></cds-icon>
         </button>
     </div>

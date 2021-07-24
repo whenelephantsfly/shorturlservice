@@ -16,18 +16,19 @@ export class ConvertUrlComponent implements OnInit {
   }
 
   onSubmit() {
-    const data = {
-      longUrl: this.longUrl
-    }
+    let formData = new FormData();
+    formData.append('url', this.longUrl);
 
-    fetch("localhost:8000/generateShortUrl", {
+    fetch("/api/generateShortUrl", {
       method: "POST",
-      body: JSON.stringify(data)
+      body: JSON.stringify(formData)
     }).then(response => response.json())
     .then(data => {
       this.responseData = data;
+      this.longUrl = '';
+      console.log(this.responseData);
     })
-    .catch(e => console.log(e));
+    .catch(e => console.error(e));
   }
 
 }

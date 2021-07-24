@@ -69,11 +69,16 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
+              "proxyConfig": "src/proxy.conf.json",
               "browserTarget": "short-url-ui:build:production"
             },
             "development": {
+              "proxyConfig": "src/proxy.conf.json",
               "browserTarget": "short-url-ui:build:development"
             }
+          },
+          "options": {
+            "proxyConfig": "src/proxy.conf.json"
           },
           "defaultConfiguration": "development"
         },

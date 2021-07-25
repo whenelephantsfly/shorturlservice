@@ -2,18 +2,18 @@
     <br><br><br><br>
     <h1 style="text-align: center; color: white; font-weight: bold;">Shorten a URL</h1>
     <br><br><br><br>
-    <div *ngIf="responseData != {}" class="flex-container">
-        <input style="background-color: white; width: 800%;" placeholder="Paste a URL"
+    <div *ngIf="showInput" class="flex-container">
+        <input style="background-color: white; width: 80%;" placeholder="Paste a URL"
             name="longUrl" [(ngModel)]="longUrl" />
         <button (click)="onSubmit()" class="btn btn-lg btn-primary btn-icon">
             <cds-icon shape="check"></cds-icon>
         </button>
     </div>
-    <div *ngIf="responseData.shortURL" class="flex-container">
-        <input style="background-color: white;" placeholder="Paste a URL"
-            name="shortUrl" [value]="responseData.shortURL" size="180"/>
-        <button class="btn btn-lg btn-primary btn-icon">
-            <cds-icon shape="check"></cds-icon>
+    <div *ngIf="!showInput" class="flex-container">
+        <input style="background-color: white; width: 80%;" placeholder="Paste a URL"
+            name="shortUrl" [(ngModel)]="longUrl" (ngModelChange)="changed()"/>
+        <button (click)="copyLink()" class="btn btn-lg btn-primary btn-icon">
+            <cds-icon shape="copy"></cds-icon>
         </button>
     </div>
     <br><br><br><br>

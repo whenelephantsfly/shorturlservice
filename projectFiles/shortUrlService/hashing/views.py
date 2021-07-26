@@ -50,6 +50,10 @@ def generate_short_url(request):
     if request.method == 'POST':
         post_data = json.loads(request.body.decode("utf-8"))
         url = post_data.get('url')
+        try:
+            minutes_expiration_date_and_time = post_data.get('expirationDateAndTime')
+        except:
+            minutes_expiration_date_and_time = 24 * 60
 
         # Check- Given Url is valid
         if not url_validator(url):
@@ -73,21 +77,20 @@ def generate_short_url(request):
             flag = short_url_check(request, tiny_url_path)
             if not flag:
                 current_date_and_time = datetime.datetime.now()
-                hours_added = datetime.timedelta(hours=24)
+                hours_added = datetime.timedelta(minutes=minutes_expiration_date_and_time)
                 future_date_and_time = current_date_and_time + hours_added
 
                 record = {"shortURL": get_domain_name() + tiny_url_path,
                           "isPrivate": False,
                           "originalURL": url,
-                          "creationDate":  current_date_and_time.isoformat(),
-                          "expirationDate":  future_date_and_time.isoformat()}
+                          "creationDate": current_date_and_time.isoformat(),
+                          "expirationDate": future_date_and_time.isoformat()}
                 url_collection.insert_one(record)
                 page_sanitized = json.loads(json_util.dumps(record))
-                cache.set(url, record, timeout = CACHE_TTL)
+                cache.set(url, record, timeout=CACHE_TTL)
                 return JsonResponse(page_sanitized)
             else:
                 tiny_url_path = key32[(i + 1): (i + 8)]
-
 
         return HttpResponse("Cannot create Tiny URL for given URL")
 
@@ -117,6 +120,3 @@ def delete_url_data(request):
     print(domain)
 
     return HttpResponse(domain)
-
-
-

@@ -27,4 +27,7 @@ Manthan -
 	Setup the Django develpoment environmnet and helped the team with the same.
 
 Day 3:-
-	
+	Manognya - setting up Redis for caching for Django and MongoDB, running the server and testing
+
+Day 4:-
+	Manognya - added caching code to Django project

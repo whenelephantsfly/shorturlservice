@@ -59,6 +59,10 @@ def generate_short_url(request):
         if get_domain_name() in url:
             return HttpResponse("Cannot create tiny Url for this domain.")
 
+        if url in cache:
+            record = cache.get(url)
+            page_sanitized = json.loads(json_util.dumps(record))
+            return JsonResponse(page_sanitized)
 
         # Converting the URL to 32 bit MD5 hash value.
         key32 = hashlib.md5(url.encode()).hexdigest()
@@ -79,9 +83,11 @@ def generate_short_url(request):
                           "expirationDate":  future_date_and_time.isoformat()}
                 url_collection.insert_one(record)
                 page_sanitized = json.loads(json_util.dumps(record))
+                cache.set(url, record, timeout = CACHE_TTL)
                 return JsonResponse(page_sanitized)
             else:
                 tiny_url_path = key32[(i + 1): (i + 8)]
+
 
         return HttpResponse("Cannot create Tiny URL for given URL")
 

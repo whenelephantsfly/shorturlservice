@@ -11,6 +11,14 @@ from django.http import JsonResponse
 from bson import json_util, ObjectId
 import json
 
+from django.core.cache import cache
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
+
+
+
 connect_string = 'mongodb+srv://mukul:samplepassword@cluster0.2ergm.mongodb.net/test'
 db_client = MongoClient(connect_string)
 dbname = db_client['shortURLDB']
@@ -42,6 +50,7 @@ def generate_short_url(request):
         # Check if tinyurl is given
         if request.build_absolute_uri('/')[:-1] in url:
             return HttpResponse("Cannot create tiny Url for this domain.")
+
 
         # Converting the URL to 32 bit MD5 hash value.
         key32 = hashlib.md5(url.encode()).hexdigest()

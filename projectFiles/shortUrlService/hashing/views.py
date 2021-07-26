@@ -10,6 +10,7 @@ import datetime
 from django.http import JsonResponse
 from bson import json_util, ObjectId
 import json
+from django.shortcuts import redirect
 
 from django.core.cache import cache
 from django.conf import settings
@@ -17,16 +18,21 @@ from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
+try:
+    connect_string = 'mongodb+srv://mukul:samplepassword@cluster0.2ergm.mongodb.net/test'
+    db_client = MongoClient(connect_string)
+    dbname = db_client['shortURLDB']
+    url_collection = dbname['URL']
+except Exception as error:
+    print(error)
 
 
-connect_string = 'mongodb+srv://mukul:samplepassword@cluster0.2ergm.mongodb.net/test'
-db_client = MongoClient(connect_string)
-dbname = db_client['shortURLDB']
-url_collection = dbname['URL']
+def get_domain_name():
+    return "http://127.0.0.1:8000/"
 
 
-def get_short_url(request, tiny_url_path):
-    if url_collection.find({"shortURL": request.build_absolute_uri('/')[:-1] + "/" + tiny_url_path}).count() > 0:
+def short_url_check(request, tiny_url_path):
+    if url_collection.find({"shortURL": get_domain_name() + tiny_url_path}).count() > 0:
         return True
     return False
 
@@ -42,13 +48,15 @@ def url_validator(url):
 @csrf_exempt
 def generate_short_url(request):
     if request.method == 'POST':
-        url = request.POST.get('url')
+        post_data = json.loads(request.body.decode("utf-8"))
+        url = post_data.get('url')
+
         # Check- Given Url is valid
         if not url_validator(url):
             return HttpResponse("Given url is not valid")
 
         # Check if tinyurl is given
-        if request.build_absolute_uri('/')[:-1] in url:
+        if get_domain_name() in url:
             return HttpResponse("Cannot create tiny Url for this domain.")
 
 
@@ -58,19 +66,18 @@ def generate_short_url(request):
 
         for i in range(25):
             # Check database if key is present
-            flag = get_short_url(request, tiny_url_path)
+            flag = short_url_check(request, tiny_url_path)
             if not flag:
                 current_date_and_time = datetime.datetime.now()
                 hours_added = datetime.timedelta(hours=24)
                 future_date_and_time = current_date_and_time + hours_added
 
-                record = {"shortURL": request.build_absolute_uri('/')[:-1] + "/" + tiny_url_path,
+                record = {"shortURL": get_domain_name() + tiny_url_path,
                           "isPrivate": False,
                           "originalURL": url,
-                          "creationDate":  current_date_and_time.utcnow().isoformat(),
-                          "expirationDate":  future_date_and_time.utcnow().isoformat()}
+                          "creationDate":  current_date_and_time.isoformat(),
+                          "expirationDate":  future_date_and_time.isoformat()}
                 url_collection.insert_one(record)
-                # Remaining - Return complete Json object.
                 page_sanitized = json.loads(json_util.dumps(record))
                 return JsonResponse(page_sanitized)
             else:
@@ -83,9 +90,16 @@ def get_original_url(request):
     pass
 
 
-def redirect(request):
-    # Check if tiny url is given
-    pass
+@csrf_exempt
+def redirect_url(request):
+    urls = url_collection.find({"shortURL": get_domain_name() + request.path[1:]})
+    try:
+        for url in urls:
+            return redirect(url['originalURL'])
+    except Exception as e:
+        return HttpResponse(e)
+
+    return HttpResponse("Given url is invalid")
 
 
 def delete_url_data(request):

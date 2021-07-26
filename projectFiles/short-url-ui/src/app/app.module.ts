@@ -10,6 +10,7 @@ import { SignupComponent } from './signup/signup.component';
 import { ConvertUrlComponent } from './convert-url/convert-url.component';
 import { AllUrlsComponent } from './all-urls/all-urls.component';
 import { FormsModule } from '@angular/forms';
+import { LoginnextComponent } from './loginnext/loginnext.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { FormsModule } from '@angular/forms';
     LoginComponent,
     ConvertUrlComponent,
     AllUrlsComponent,
-    SignupComponent
+    SignupComponent,
+    LoginnextComponent
   ],
   imports: [
     BrowserModule,

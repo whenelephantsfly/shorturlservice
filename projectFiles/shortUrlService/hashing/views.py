@@ -12,7 +12,7 @@ from bson import json_util, ObjectId
 import json
 from django.shortcuts import redirect
 
-from django.core.cache import cache
+from django.core.cache import caches
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
@@ -59,8 +59,9 @@ def generate_short_url(request):
         if get_domain_name() in url:
             return HttpResponse("Cannot create tiny Url for this domain.")
 
-        if url in cache:
-            record = cache.get(url)
+        c1 = caches['default']
+        if url in c1:
+            record = c1.get(url)
             page_sanitized = json.loads(json_util.dumps(record))
             return JsonResponse(page_sanitized)
 
@@ -83,7 +84,7 @@ def generate_short_url(request):
                           "expirationDate":  future_date_and_time.isoformat()}
                 url_collection.insert_one(record)
                 page_sanitized = json.loads(json_util.dumps(record))
-                cache.set(url, record, timeout = CACHE_TTL)
+                c1.set(url, record, timeout = CACHE_TTL)
                 return JsonResponse(page_sanitized)
             else:
                 tiny_url_path = key32[(i + 1): (i + 8)]
@@ -100,8 +101,15 @@ def get_original_url(request):
 def redirect_url(request):
     urls = url_collection.find({"shortURL": get_domain_name() + request.path[1:]})
     try:
-        for url in urls:
-            return redirect(url['originalURL'])
+        c2 = caches['shortUrlKey']
+        if (get_domain_name() + request.path[1:]) in c2:
+            record = c2.get(get_domain_name() + request.path[1:])
+            return redirect(record["longURL"])
+        else:
+            for url in urls:
+                longURL = url['originalURL']
+                c2.set(get_domain_name() + request.path[1:], longURL, timeout = CACHE_TTL)
+                return redirect(longURL)
     except Exception as e:
         return HttpResponse(e)
 

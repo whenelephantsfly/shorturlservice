@@ -1,18 +1,27 @@
-<form class="clr-form clr-form-horizontal" class="bg-img">
+<form class="clr-form clr-form-horizontal" style="text-align: center;" class="bg-img">
     <br><br><br><br>
-    <h1 style="text-align: center; color: white; font-weight: bold;">Shorten a URL</h1>
+    <h1 style="text-align: center; font-weight: bold;">Shorten a URL</h1>
     <br><br><br><br>
-    <div *ngIf="showInput" class="flex-container">
-        <input style="background-color: white; width: 80%;" placeholder="Paste a URL"
-            name="longUrl" [(ngModel)]="longUrl" />
-        <button (click)="onSubmit()" class="btn btn-lg btn-primary btn-icon">
+    <div class="flex-container">
+        <input style="background-color: white; width: 80%;" placeholder="Paste a URL" name="longUrl"
+            [(ngModel)]="longUrl" />
+        <button (click)="onSubmit()" [disabled]="!isValidUrl"
+            class="btn btn-lg btn-primary btn-icon tooltip tooltip-xs">
             <cds-icon shape="check"></cds-icon>
+            <span *ngIf="!isValidUrl" class="tooltip-content">Not a valid URL</span>
         </button>
+
     </div>
-    <div *ngIf="!showInput" class="flex-container">
-        <input style="background-color: white; width: 80%;" placeholder="Paste a URL"
-            name="shortUrl" [(ngModel)]="longUrl" (ngModelChange)="changed()"/>
-        <button (click)="copyLink()" class="btn btn-lg btn-primary btn-icon">
+    <br>
+    <input type="text" placeholder="Expiration time (in ms)" />
+    <br><br>
+    <div *ngIf="shortUrl" class="flex-container">
+        <h5><b>Your Short URL: &nbsp;&nbsp;&nbsp;&nbsp; </b></h5>
+        <a [href]="shortUrl" target="_blank">
+            <h5 style="color: teal;">{{shortUrl}}</h5>
+        </a>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button (click)="copyLink()" class="btn btn-lg btn-icon">
             <cds-icon shape="copy"></cds-icon>
         </button>
     </div>

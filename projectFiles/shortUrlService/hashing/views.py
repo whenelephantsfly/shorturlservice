@@ -11,7 +11,7 @@ from django.http import JsonResponse
 from bson import json_util, ObjectId
 import json
 from django.shortcuts import redirect
-
+import re
 from django.core.cache import caches
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
@@ -38,10 +38,18 @@ def short_url_check(request, tiny_url_path):
 
 
 def url_validator(url):
-    try:
-        URLValidator()(url)
+    regex = ("[a-zA-Z0-9@:%._\\+~#?&//=]" +
+             "{2,256}\\.[a-z]" +
+             "{2,6}\\b([-a-zA-Z0-9@:%" +
+             "._\\+~#?&//=]*)")
+    p = re.compile(regex)
+
+    if url is None:
+        return False
+
+    if re.search(p, url):
         return True
-    except ValidationError:
+    else:
         return False
 
 
@@ -50,18 +58,19 @@ def generate_short_url(request):
     if request.method == 'POST':
         post_data = json.loads(request.body.decode("utf-8"))
         url = post_data.get('url')
+
         try:
-            minutes_expiration_date_and_time = post_data.get('expirationDateAndTime')
+            milliseconds_expiration_date_and_time = post_data.get('expirationDateAndTime')
         except:
-            minutes_expiration_date_and_time = 24 * 60
+            milliseconds_expiration_date_and_time = 8.64e+7
 
         # Check- Given Url is valid
         if not url_validator(url):
-            return HttpResponse("Given url is not valid")
+            return JsonResponse({"Error": "Given url is not valid"})
 
         # Check if tinyurl is given
         if get_domain_name() in url:
-            return HttpResponse("Cannot create tiny Url for this domain.")
+            return JsonResponse({"Error": "Cannot create tiny Url for this domain."})
 
         c1 = caches['default']
         if url in c1:
@@ -77,23 +86,23 @@ def generate_short_url(request):
             # Check database if key is present
             flag = short_url_check(request, tiny_url_path)
             if not flag:
-                current_date_and_time = datetime.datetime.now()
-                hours_added = datetime.timedelta(minutes=minutes_expiration_date_and_time)
+                current_date_and_time = datetime.datetime.utcnow()
+                hours_added = datetime.timedelta(milliseconds=milliseconds_expiration_date_and_time)
                 future_date_and_time = current_date_and_time + hours_added
 
                 record = {"shortURL": get_domain_name() + tiny_url_path,
                           "isPrivate": False,
                           "originalURL": url,
-                          "creationDate": current_date_and_time.isoformat(),
-                          "expirationDate": future_date_and_time.isoformat()}
+                          "creationDate": current_date_and_time,
+                          "expirationDate": future_date_and_time}
                 url_collection.insert_one(record)
                 page_sanitized = json.loads(json_util.dumps(record))
-                c1.set(url, record, timeout = CACHE_TTL)
+                c1.set(url, record, timeout=CACHE_TTL)
                 return JsonResponse(page_sanitized)
             else:
                 tiny_url_path = key32[(i + 1): (i + 8)]
 
-        return HttpResponse("Cannot create Tiny URL for given URL")
+        return JsonResponse({"Error": "Cannot create Tiny URL for given URL"})
 
 
 def get_original_url(request):
@@ -111,7 +120,7 @@ def redirect_url(request):
         else:
             for url in urls:
                 longURL = url['originalURL']
-                c2.set(get_domain_name() + request.path[1:], longURL, timeout = CACHE_TTL)
+                c2.set(get_domain_name() + request.path[1:], longURL, timeout=CACHE_TTL)
                 return redirect(longURL)
     except Exception as e:
         return HttpResponse(e)

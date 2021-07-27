@@ -1,5 +1,50 @@
 <div class="login-wrapper">
   <form class="login">
+
+
+    <div class="alert alert-danger" *ngIf="!inputs">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <cds-icon class="alert-icon" shape="exclamation-circle"></cds-icon>
+          </div>
+          <span class="alert-text">
+            Please enter valid Username and Password
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-danger" *ngIf="!pass_copass">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <cds-icon class="alert-icon" shape="exclamation-circle"></cds-icon>
+          </div>
+          <span class="alert-text">
+            Password and Confirm Password didn't match.
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="alert alert-danger" *ngIf="!user_already_exist">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <cds-icon class="alert-icon" shape="exclamation-circle"></cds-icon>
+          </div>
+          <span class="alert-text">
+            User already Exist.
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+
+
     <section class="title">
       <h3 class="welcome">Welcome to</h3>
       Short URL Service
@@ -7,25 +52,25 @@
     <div class="login-group">
       <clr-input-container>
         <label class="clr-sr-only">Username</label>
-        <input type="text" name="username" clrInput placeholder="Username" />
+        <input type="text" name="username" clrInput placeholder="Username" [(ngModel)]="username" name="username" required/>
+        <clr-control-error>You must provide valid Username!</clr-control-error>
       </clr-input-container>
       <clr-input-container>
         <label class="clr-sr-only">Email Id</label>
-        <input type="email" name="username" clrInput placeholder="Email Id" />
+        <input type="email" name="emailid" clrInput placeholder="Email Id" [(ngModel)]="emailid" name="emailid" required/>
+        <clr-control-error>You must provide valid Email Id!</clr-control-error>
       </clr-input-container>
       <clr-password-container>
         <label class="clr-sr-only">Password</label>
-        <input type="password" name="password" clrPassword placeholder="Password" />
+        <input type="password" name="password" clrPassword placeholder="Password" [(ngModel)]="password" name="password" required/>
+        <clr-control-error>You must provide valid Password!</clr-control-error>
       </clr-password-container>
       <clr-password-container>
         <label class="clr-sr-only">Confirm Password</label>
-        <input type="password" name="password" clrPassword placeholder="Confirm Password" />
+        <input type="password" name="confirmpassword" clrPassword placeholder="Confirm Password" [(ngModel)]="confirmpassword" name="confirmpassword" required/>
+        <clr-control-error>You must confirm your Password!</clr-control-error>
       </clr-password-container>  
-      
- <div class="error active">
-        Invalid user name or password
-      </div>  
-      <button type="submit" class="btn btn-primary">Sign Up</button>
+      <button type="submit" class="btn btn-primary" (click) = "signupvalidate()" >Sign Up</button>
       <label>Already have an account? <a routerLink="/login" class="nav-link nav-text" routerLinkActive="active"><u><b>Login</b></u> </a>
       </label>
     </div>

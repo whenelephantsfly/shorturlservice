@@ -1,28 +1,45 @@
 <div class="login-wrapper">
   <form class="login">
+    
+    <div class="alert alert-danger" *ngIf="!inputValid">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <cds-icon class="alert-icon" shape="exclamation-circle"></cds-icon>
+          </div>
+          <span class="alert-text">
+            Please enter valid Username and Password
+          </span>
+        </div>
+      </div>
+    </div>
+
     <section class="title">
       <h3 class="welcome">Welcome to</h3>
       Short URL Service
       </section>
     <div class="login-group">
+    
+     
       <clr-input-container>
         <label class="clr-sr-only">Username</label>
-        <input type="text" name="username" clrInput placeholder="Username" />
+        <input type="text" name="username" clrInput placeholder="Username" [(ngModel)]="username" name="username" required/>
+        <clr-control-error>Username Required!</clr-control-error>
       </clr-input-container>
       <clr-password-container>
         <label class="clr-sr-only">Password</label>
-        <input type="password" name="password" clrPassword placeholder="Password" />
+        <input type="password" name="password" clrPassword placeholder="Password" [(ngModel)]="password" name="password" required/>
+        <clr-control-error>Password Required!!</clr-control-error>
       </clr-password-container>
       <clr-checkbox-wrapper>
         <label>Remember me</label>
-        <input type="checkbox" name="rememberMe" clrCheckbox />
+        <input type="checkbox" name="rememberMe" clrCheckbox [(ngModel)]="rememberMe" />
       </clr-checkbox-wrapper>
-   <!-- <div class="error active">
-        Invalid user name or password
-      </div>  -->
-      <button type="submit" class="btn btn-primary" routerLink="/loginnext"  routerLinkActive="active">Login</button>
-      <label>Don't have an account? <a routerLink="/signup" class="nav-link nav-text" routerLinkActive="active"><u><b>Sign Up</b></u> </a>
-      </label>
+      <button type="submit"  (click)="validate()" class="btn btn-primary" >Login</button>
+
+      
+  
+      <label>Not a member?  <a href="signup" class="signup"> <b>Sign Up</b> </a></label>
     </div>
   </form>
 </div>

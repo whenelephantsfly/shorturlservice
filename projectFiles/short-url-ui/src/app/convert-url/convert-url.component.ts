@@ -8,12 +8,16 @@ import { Component, OnInit } from '@angular/core';
 export class ConvertUrlComponent implements OnInit {
 
   longUrl: string = "";
-  showInput: boolean = true;
+  shortUrl: string = "";
   responseData: any = {};
 
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  get isValidUrl() {
+    return this.longUrl.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&=]*)/g);
   }
 
   onSubmit() {
@@ -35,15 +39,14 @@ export class ConvertUrlComponent implements OnInit {
     }).then(response => response.json())
     .then(data => {
       this.responseData = data;
-      this.longUrl = this.responseData.shortURL;
-      this.showInput = false;
+      // this.longUrl = this.responseData.shortURL;
+      this.shortUrl = this.responseData.shortURL;
       console.log(this.responseData);
     })
     .catch(e => console.error(e));
   }
 
   changed() {
-    this.showInput = true;
     console.log("Changed");
   }
 

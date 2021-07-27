@@ -128,7 +128,7 @@ def redirect_url(request):
     except Exception as e:
         return HttpResponse(e)
 
-    return HttpResponse("Given url is invalid")
+    return HttpResponse("Given url does not exist")
 
 
 def delete_url_data(request):

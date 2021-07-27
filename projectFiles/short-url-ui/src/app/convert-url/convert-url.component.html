@@ -1,32 +1,74 @@
+<!-- Top level Navbar -->
+<header class="header-1">
+    <div class="branding">
+        <a href="javascript://" class="nav-link">
+            <cds-icon shape="vm-bug"></cds-icon>
+            <span class="title">Short URL Service</span>
+        </a>
+    </div>
+    <div class="header-nav">
+        <a routerLink="/" [routerLinkActiveOptions]="{exact: true}" class="nav-link nav-text"
+            routerLinkActive="active">Dashboard</a>
+        <!-- <a routerLink="/login" class="nav-link nav-text" routerLinkActive="active">Login</a>
+     -->
+    </div>
+
+    <div class="header-actions" *ngIf="username === '' ; else showUser">
+        <a routerLink="/login" class="nav-link nav-text">
+            Log In
+        </a>
+    </div>
+    <ng-template #showUser>
+        <div class="header-actions">
+            <span class="user-text"> {{username}} </span>
+            <a routerLink="/login" class="nav-link nav-text">
+                Log Out
+            </a>
+        </div>
+    </ng-template>
+
+</header>
 <form class="clr-form clr-form-horizontal" style="text-align: center;" class="bg-img">
-    <br><br><br><br>
+    <br><br>
+    <div class="alert alert-danger" *ngIf="errorMessage">
+        <div class="alert-items">
+            <div class="alert-item static">
+                <div class="alert-icon-wrapper">
+                    <cds-icon class="alert-icon" shape="exclamation-circle"></cds-icon>
+                </div>
+                <span class="alert-text">
+                    {{errorMessage}}
+                </span>
+            </div>
+        </div>
+    </div>
+    <br><br>
     <h1 style="text-align: center; font-weight: bold;">Shorten a URL</h1>
     <br><br><br><br>
     <div class="flex-container">
         <input style="background-color: white; width: 80%;" placeholder="Paste a URL" name="longUrl"
             [(ngModel)]="longUrl" />
-        <button (click)="onSubmit()" [disabled]="!isValidUrl"
-            class="btn btn-lg btn-primary btn-icon tooltip tooltip-xs">
-            <cds-icon shape="check"></cds-icon>
+        <button (click)="onSubmit()" [disabled]="!isValidUrl" class="btn btn-lg btn-primary tooltip tooltip-xs">
+            Short URL
             <span *ngIf="!isValidUrl" class="tooltip-content">Not a valid URL</span>
         </button>
 
     </div>
     <br>
-    <label for="expirationDateAndTime">Expiration time in ms: (default: 24 hours) &nbsp;&nbsp;&nbsp;&nbsp;</label>
-    <input type="text" placeholder="Expiration time (in ms)" name="expirationDateAndTime" [(ngModel)]="expirationDateAndTime" />
+    <label class="shortURLLabel" for="expirationDateAndTime">Expiration time (default: 24 hours):
+        &nbsp;&nbsp;&nbsp;&nbsp;</label>
+    <!-- <input type="text" placeholder="Expiration time (in ms)" name="expirationDateAndTime" [(ngModel)]="expirationDateAndTime" /> -->
+    <input type="datetime-local" name="expirationDateAndTime" [(ngModel)]="expirationDateAndTime">
     <br><br>
     <div *ngIf="shortUrl" class="flex-container">
-        <h5><b>Your Short URL: &nbsp;&nbsp;&nbsp;&nbsp; </b></h5>
-        <a [href]="shortUrl" target="_blank">
-            <h5 style="color: teal;">{{shortUrl}}</h5>
+        <label class="shortURLLabel">Your Short URL: &nbsp;&nbsp;&nbsp;&nbsp; </label>
+        <a class="shortURLLabel" [href]="shortUrl" target="_blank">
+            {{shortUrl}}
         </a>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button (click)="copyLink()" class="btn btn-lg btn-icon">
-            <cds-icon shape="copy"></cds-icon>
+        &nbsp;&nbsp;
+        <button (click)="copyLink()" title="Copy link" class="btn btn-link btn-icon">
+            <cds-icon size="md" shape="copy"></cds-icon>
         </button>
     </div>
     <br><br><br><br>
 </form>
-<a routerLink="/login" class="nav-link nav-text" routerLinkActive="active">Login</a>
-  

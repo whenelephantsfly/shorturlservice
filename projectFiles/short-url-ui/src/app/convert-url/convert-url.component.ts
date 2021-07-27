@@ -10,7 +10,10 @@ export class ConvertUrlComponent implements OnInit {
   longUrl: string = "";
   shortUrl: string = "";
   responseData: any = {};
-  expirationDateAndTime: string = 24 * 60 * 60 * 1000 + "";
+  errorMessage: string = "";
+  username: string = "";
+  // expirationDateAndTime: string = 24 * 60 * 60 * 1000 + "";
+  expirationDateAndTime: string = new Date(new Date().getTime() + (24 * 60 * 60 * 1000)).toISOString().slice(0, 16);
 
   constructor() { }
 
@@ -19,12 +22,21 @@ export class ConvertUrlComponent implements OnInit {
 
   get isValidUrl() {
     return this.longUrl.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&=]*)/g);
+    return true
   }
 
   onSubmit() {
 
-    let postData = { "url": this.longUrl, "expirationDateAndTime": parseInt(this.expirationDateAndTime) }
+    var difference = new Date(this.expirationDateAndTime).getTime() - new Date().getTime();
+
+    let postData = { 
+      "url": this.longUrl,
+      "expirationDateAndTime": difference
+      // "expirationDateAndTime": parseInt(this.expirationDateAndTime) 
+    }
     console.log(postData);
+    console.log(difference);
+    console.log(this.expirationDateAndTime)
     fetch("/api/generateShortUrl", {
       method: "POST",
       headers: {
@@ -34,14 +46,12 @@ export class ConvertUrlComponent implements OnInit {
     }).then(response => response.json())
       .then(data => {
         this.responseData = data;
+        if(this.responseData.Error) this.errorMessage = this.responseData.Error;
+        else this.errorMessage = "";
         this.shortUrl = this.responseData.shortURL;
         console.log(this.responseData);
       })
       .catch(e => console.error(e));
-  }
-
-  changed() {
-    console.log("Changed");
   }
 
   copyLink() {
@@ -50,12 +60,16 @@ export class ConvertUrlComponent implements OnInit {
     selBox.style.left = '0';
     selBox.style.top = '0';
     selBox.style.opacity = '0';
-    selBox.value = this.longUrl;
+    selBox.value = this.shortUrl;
     document.body.appendChild(selBox);
     selBox.focus();
     selBox.select();
     document.execCommand('copy');
     document.body.removeChild(selBox);
+  }
+
+  changed() {
+    console.log(this.expirationDateAndTime)
   }
 
 }

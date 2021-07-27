@@ -96,7 +96,7 @@ def generate_short_url(request):
                 url_collection.insert_one(record)
                 page_sanitized = json.loads(json_util.dumps(record))
                 cache_size = cache.dbsize()
-                if cache_size > 98:
+                if cache_size > 198:
                     least_recently_used_key = cache.randomkey()
                     longest_idle = cache.object("idletime", least_recently_used_key)
                     for key in cache.scan_iter("*"):
@@ -134,7 +134,7 @@ def redirect_url(request):
                 remainingTimeToExp = expDate - today
                 if remainingTimeToExp > 0:
                     cache_size = cache.dbsize()
-                    if cache_size > 99:
+                    if cache_size > 199:
                         least_recently_used_key = cache.randomkey()
                         longest_idle = cache.object("idletime", least_recently_used_key)
                         for key in cache.scan_iter("*"):

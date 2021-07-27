@@ -119,7 +119,11 @@ def redirect_url(request):
             urls = url_collection.find({"shortURL": get_domain_name() + request.path[1:]})
             for url in urls:
                 longURL = url['originalURL']
-                cache.set(get_domain_name() + request.path[1:], longURL, timeout = CACHE_TTL)
+                expDate = url['expirationDate']
+                today = datetime.datetime.utcnow()
+                remainingTimeToExp = expDate - today
+                if(remainingTimeToExp > 0):
+                    cache.set(get_domain_name() + request.path[1:], longURL, timeout=remainingTimeToExp.total_seconds())
                 return redirect(longURL)
     except Exception as e:
         return HttpResponse(e)

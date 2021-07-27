@@ -26,7 +26,6 @@ try:
 except Exception as error:
     print(error)
 
-
 def get_domain_name():
     return "http://127.0.0.1:8000/"
 
@@ -96,6 +95,17 @@ def generate_short_url(request):
                           "expirationDate": future_date_and_time}
                 url_collection.insert_one(record)
                 page_sanitized = json.loads(json_util.dumps(record))
+                cache_size = cache.dbsize()
+                if cache_size > 198:
+                    least_recently_used_key = cache.randomkey()
+                    longest_idle = cache.object("idletime", least_recently_used_key)
+                    for key in cache.scan_iter("*"):
+                        idle = cache.object("idletime", key)
+                        if idle > longest_idle:
+                            least_recently_used_key = key
+                            longest_idle = idle
+                    cache.delete(least_recently_used_key)
+
                 cache.set(url, record, timeout = milliseconds_expiration_date_and_time / 1000)
                 cache.set(get_domain_name() + tiny_url_path, record, timeout = milliseconds_expiration_date_and_time / 1000)
                 return JsonResponse(page_sanitized)
@@ -122,7 +132,17 @@ def redirect_url(request):
                 expDate = url['expirationDate']
                 today = datetime.datetime.utcnow()
                 remainingTimeToExp = expDate - today
-                if(remainingTimeToExp > 0):
+                if remainingTimeToExp > 0:
+                    cache_size = cache.dbsize()
+                    if cache_size > 199:
+                        least_recently_used_key = cache.randomkey()
+                        longest_idle = cache.object("idletime", least_recently_used_key)
+                        for key in cache.scan_iter("*"):
+                            idle = cache.object("idletime", key)
+                            if idle > longest_idle:
+                                least_recently_used_key = key
+                                longest_idle = idle
+                        cache.delete(least_recently_used_key)
                     cache.set(get_domain_name() + request.path[1:], longURL, timeout=remainingTimeToExp.total_seconds())
                 return redirect(longURL)
     except Exception as e:
@@ -140,3 +160,4 @@ def delete_url_data(request):
     print(domain)
 
     return HttpResponse(domain)
+

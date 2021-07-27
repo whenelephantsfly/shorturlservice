@@ -11,7 +11,8 @@ const routes: Routes = [
   {path: '', component: ConvertUrlComponent},
   {path: 'allUrls', component: AllUrlsComponent},
   {path: 'signup', component: SignupComponent},
-  {path: 'loginnext', component:LoginnextComponent}
+  {path: 'loginnext', component:LoginnextComponent},
+  {path: 'convert-url',component:ConvertUrlComponent}
 ];
 
 @NgModule({

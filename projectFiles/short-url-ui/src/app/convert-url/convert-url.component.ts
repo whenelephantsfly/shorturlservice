@@ -10,6 +10,7 @@ export class ConvertUrlComponent implements OnInit {
   longUrl: string = "";
   shortUrl: string = "";
   responseData: any = {};
+  expirationDateAndTime: string = 24 * 60 * 60 * 1000 + "";
 
   constructor() { }
 
@@ -21,29 +22,22 @@ export class ConvertUrlComponent implements OnInit {
   }
 
   onSubmit() {
-    let postData = {
-      "url": this.longUrl
-    }
 
-    // this.http.post('/api/generateShortUrl', {url: this.longUrl}).subscribe(response => {
-    //   this.responseData = response;
-    //   console.log(response);
-    // });
-
+    let postData = { "url": this.longUrl, "expirationDateAndTime": parseInt(this.expirationDateAndTime) }
+    console.log(postData);
     fetch("/api/generateShortUrl", {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({"url": this.longUrl})
+      body: JSON.stringify(postData)
     }).then(response => response.json())
-    .then(data => {
-      this.responseData = data;
-      // this.longUrl = this.responseData.shortURL;
-      this.shortUrl = this.responseData.shortURL;
-      console.log(this.responseData);
-    })
-    .catch(e => console.error(e));
+      .then(data => {
+        this.responseData = data;
+        this.shortUrl = this.responseData.shortURL;
+        console.log(this.responseData);
+      })
+      .catch(e => console.error(e));
   }
 
   changed() {

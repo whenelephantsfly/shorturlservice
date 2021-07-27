@@ -14,7 +14,8 @@
 
     </div>
     <br>
-    <input type="text" placeholder="Expiration time (in ms)" />
+    <label for="expirationDateAndTime">Expiration time in ms: (default: 24 hours) &nbsp;&nbsp;&nbsp;&nbsp;</label>
+    <input type="text" placeholder="Expiration time (in ms)" name="expirationDateAndTime" [(ngModel)]="expirationDateAndTime" />
     <br><br>
     <div *ngIf="shortUrl" class="flex-container">
         <h5><b>Your Short URL: &nbsp;&nbsp;&nbsp;&nbsp; </b></h5>

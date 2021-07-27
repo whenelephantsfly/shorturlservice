@@ -1,34 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  username: string = "";
-  password: string = "";
-  inputValid:boolean=true;
-  rememberMe:  boolean=false;
+  
 
   constructor() { }
 
   ngOnInit(): void {
   }
 
-  validate()
+  userlogin = new FormGroup({
+    username: new FormControl('', Validators.required),
+    password: new FormControl('',Validators.required)
+  });
+  
+  onSubmit()
   {
     
-    if(this.username=="" || this.password==""){
-      
-      this.inputValid=false;
-    }
-    else{
-      this.inputValid=true;
-      location.href = "/convert-url";
-    }
-    
   }
-
 
 }

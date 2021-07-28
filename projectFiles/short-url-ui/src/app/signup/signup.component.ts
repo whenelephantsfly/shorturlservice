@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
+import { FormGroup,FormControl, Validators } from '@angular/forms';
+
+
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
@@ -7,50 +10,22 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SignupComponent implements OnInit {
 
-  username: string = "";
-  password: string = "";
-  confirmpassword: string="";
-  emailid: string="";
-  inputs: boolean=true;
-  pass_copass:boolean=true;
-  user_already_exist:boolean=true;
+  
   constructor() { }
 
   ngOnInit(): void {
   }
-  signupvalidate()
-  {
-
-    if((this.username=="Megha" || this.emailid=="meghamoon02@gmail.com") &&
-    this.username!="" && this.emailid!=""){
-      
-      this.user_already_exist=false;
-    }
-    else{
-      this.user_already_exist=true;
-    }  
-
+  usersignup = new FormGroup({
+    username: new FormControl('', Validators.required),
+    emailid: new FormControl('', Validators.required),
+    password: new FormControl('',Validators.required),
+    confirmpassword: new FormControl('',Validators.required)
     
-    if(this.username=="" || this.emailid=="" || this.password=="" || this.confirmpassword==""){
-      
-      this.inputs=false;
-    }
-    else{
-      this.inputs=true;
-    }
-
-    
-
-    if(this.password!=this.confirmpassword  &&
-    this.username!="" && this.emailid!="" && this.password!="" && this.confirmpassword!="")
-    {
-      this.pass_copass=false;
-    }
-    else{
-      this.pass_copass=true;
-    }
-
-
+  });
+  
+  onSubmit(){
     
   }
+
+  
 }

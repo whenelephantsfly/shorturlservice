@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AllUrlsComponent } from './all-urls/all-urls.component';
 import { ConvertUrlComponent } from './convert-url/convert-url.component';
 import { LoginComponent } from './login/login.component';
-import { LoginnextComponent } from './loginnext/loginnext.component';
+
 import { SignupComponent } from './signup/signup.component';
 
 const routes: Routes = [
@@ -11,7 +11,7 @@ const routes: Routes = [
   {path: '', component: ConvertUrlComponent},
   {path: 'allUrls', component: AllUrlsComponent},
   {path: 'signup', component: SignupComponent},
-  {path: 'loginnext', component:LoginnextComponent},
+
   {path: 'convert-url',component:ConvertUrlComponent}
 ];
 

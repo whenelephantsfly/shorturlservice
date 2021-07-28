@@ -10,7 +10,7 @@ import { SignupComponent } from './signup/signup.component';
 import { ConvertUrlComponent } from './convert-url/convert-url.component';
 import { AllUrlsComponent } from './all-urls/all-urls.component';
 import { FormsModule } from '@angular/forms';
-import { LoginnextComponent } from './loginnext/loginnext.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -19,14 +19,15 @@ import { LoginnextComponent } from './loginnext/loginnext.component';
     ConvertUrlComponent,
     AllUrlsComponent,
     SignupComponent,
-    LoginnextComponent
+   
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ClarityModule,
     FormsModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -18,6 +18,9 @@ export class ConvertUrlComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    if(localStorage.getItem("username")) {
+      this.username = <string> localStorage.getItem("username");
+    }
   }
 
   get isValidUrl() {
@@ -70,6 +73,11 @@ export class ConvertUrlComponent implements OnInit {
 
   changed() {
     console.log(this.expirationDateAndTime)
+  }
+
+  logout() {
+    localStorage.removeItem("username");
+    localStorage.removeItem("token");
   }
 
 }

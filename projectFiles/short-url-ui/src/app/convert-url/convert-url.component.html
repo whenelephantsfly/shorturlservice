@@ -7,8 +7,7 @@
         </a>
     </div>
     <div class="header-nav">
-        <a routerLink="/" [routerLinkActiveOptions]="{exact: true}" class="nav-link nav-text"
-            routerLinkActive="active">Dashboard</a>
+        <a routerLink="/" [routerLinkActiveOptions]="{exact: true}" class="nav-link nav-text" routerLinkActive="active">Dashboard</a>
         <!-- <a routerLink="/login" class="nav-link nav-text" routerLinkActive="active">Login</a>
      -->
     </div>
@@ -21,14 +20,14 @@
     <ng-template #showUser>
         <div class="header-actions">
             <span class="user-text"> {{username}} </span>
-            <a routerLink="/login" class="nav-link nav-text">
+            <a routerLink="/login" (click)="logout()" class="nav-link nav-text">
                 Log Out
             </a>
         </div>
     </ng-template>
 
 </header>
-<form class="clr-form clr-form-horizontal" style="text-align: center;" class="bg-img">
+<form class="clr-form clr-form-horizontal" class="bg-img">
     <br><br>
     <div class="alert alert-danger" *ngIf="errorMessage">
         <div class="alert-items">
@@ -43,11 +42,10 @@
         </div>
     </div>
     <br><br>
-    <h1 style="text-align: center; font-weight: bold;">Shorten a URL</h1>
+    <h1>Shorten a URL</h1>
     <br><br><br><br>
     <div class="flex-container">
-        <input style="background-color: white; width: 80%;" placeholder="Paste a URL" name="longUrl"
-            [(ngModel)]="longUrl" />
+        <input class="longUrl" placeholder="Paste a URL" name="longUrl" [(ngModel)]="longUrl" />
         <button (click)="onSubmit()" [disabled]="!isValidUrl" class="btn btn-lg btn-primary tooltip tooltip-xs">
             Short URL
             <span *ngIf="!isValidUrl" class="tooltip-content">Not a valid URL</span>
@@ -64,8 +62,7 @@
         <label class="shortURLLabel">Your Short URL: &nbsp;&nbsp;&nbsp;&nbsp; </label>
         <a class="shortURLLabel" [href]="shortUrl" target="_blank">
             {{shortUrl}}
-        </a>
-        &nbsp;&nbsp;
+        </a> &nbsp;&nbsp;
         <button (click)="copyLink()" title="Copy link" class="btn btn-link btn-icon">
             <cds-icon size="md" shape="copy"></cds-icon>
         </button>

@@ -1,6 +1,20 @@
+h1 {
+    text-align: center;
+    font-weight: bold;
+}
+
+.longUrl {
+    background-color: white;
+    width: 80%;
+}
+
 .flex-container {
     display: flex;
     justify-content: center;
+}
+
+.bg-img {
+    text-align: center;
 }
 
 .btn {

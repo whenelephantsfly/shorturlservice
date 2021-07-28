@@ -27,17 +27,25 @@ export class LoginComponent implements OnInit {
   onSubmit()
   {
     console.log(this.userlogin.value);
-    fetch('/api/api/login', {
+    fetch('/api/api/login/', {
       method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         username: this.userlogin.value.username,
         password: this.userlogin.value.password
       })
     }).then(response => response.json())
     .then(data => {
-      this.errorMessage = "";
-      localStorage.setItem("username", this.userlogin.value.username);
-      this.router.navigate(['/']);
+      if(data.non_field_errors) this.errorMessage = data.non_field_errors;
+      else {
+        this.errorMessage = "";
+        console.log(data);
+        localStorage.setItem("username", this.userlogin.value.username);
+        localStorage.setItem("token", data.token);
+        this.router.navigate(['/']);
+      }
     })
     .catch(e => {
       this.errorMessage = e;

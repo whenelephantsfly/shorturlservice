@@ -20,7 +20,7 @@
     <ng-template #showUser>
         <div class="header-actions">
             <span class="user-text"> {{username}} </span>
-            <a routerLink="/login" class="nav-link nav-text">
+            <a routerLink="/login" (click)="logout()" class="nav-link nav-text">
                 Log Out
             </a>
         </div>

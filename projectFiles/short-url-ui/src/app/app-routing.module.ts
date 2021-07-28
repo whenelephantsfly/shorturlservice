@@ -10,9 +10,7 @@ const routes: Routes = [
   {path: 'login', component: LoginComponent},
   {path: '', component: ConvertUrlComponent},
   {path: 'allUrls', component: AllUrlsComponent},
-  {path: 'signup', component: SignupComponent},
-
-  {path: 'convert-url',component:ConvertUrlComponent}
+  {path: 'signup', component: SignupComponent}
 ];
 
 @NgModule({

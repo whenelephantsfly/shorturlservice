@@ -25,9 +25,7 @@
         <input type="password" name="cpassword" clrPassword placeholder="Confirm Password" formControlName = "confirmpassword"/>
       </clr-password-container>
 
-
-
-      <button type="submit" class="btn btn-primary" routerLink="/convert-url"  routerLinkActive="active" [disabled]="!usersignup.valid">Login</button>
+      <button type="submit" (click)="onSubmit()"class="btn btn-primary"  [disabled]="!usersignup.valid">SignUp</button>
       <label>Already have an account? <a routerLink="/login" class="nav-link nav-text" routerLinkActive="active"><u><b>Login</b></u> </a>
       </label>
     </div>

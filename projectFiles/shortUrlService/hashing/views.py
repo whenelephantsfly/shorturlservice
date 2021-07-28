@@ -1,14 +1,10 @@
-import django.core.validators
-from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from pymongo import MongoClient
 import hashlib
-from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
 import datetime
 from django.http import JsonResponse
-from bson import json_util, ObjectId
+from bson import json_util
 import json
 from django.shortcuts import redirect
 import re
@@ -26,6 +22,7 @@ try:
 except Exception as error:
     print(error)
 
+
 def get_domain_name():
     return "http://127.0.0.1:8000/"
 
@@ -41,28 +38,46 @@ def url_validator(url):
              "{2,256}\\.[a-z]" +
              "{2,6}\\b([-a-zA-Z0-9@:%" +
              "._\\+~#?&//=]*)")
-    p = re.compile(regex)
+    compiler = re.compile(regex)
 
     if url is None:
         return False
 
-    if re.search(p, url):
+    if re.search(compiler, url):
         return True
     else:
         return False
 
 
+def get_username(request):
+    # return None if not logged in
+    return 'admin'
+
+
+
 @csrf_exempt
 def generate_short_url(request):
     if request.method == 'POST':
-        # request.POST = json.loads(request.body.decode("utf-8"))
+        # post_data = json.loads(request.body.decode("utf-8"))
         url = request.POST.get('url')
-        print(url)
 
         try:
             milliseconds_expiration_date_and_time = request.POST.get('expirationDateAndTime')
+            if milliseconds_expiration_date_and_time is None:
+                milliseconds_expiration_date_and_time = 8.64e+7
         except:
             milliseconds_expiration_date_and_time = 8.64e+7
+
+        is_private = request.POST.get('isPrivate')
+        if is_private is not None or is_private is True:
+            # Remaining add logged in user to it
+            # Remanining convert allowed user string to array.
+            allowed_users = request.POST.get('allowedUsers')
+            if allowed_users is None:
+                return JsonResponse({'Error': "Please enter atleast one user"})
+        else:
+            is_private = False
+            allowed_users = None
 
         # Check- Given Url is valid
         if not url_validator(url):
@@ -72,8 +87,16 @@ def generate_short_url(request):
         if get_domain_name() in url:
             return JsonResponse({"Error": "Cannot create tiny Url for this domain."})
 
+        # Check url in cache
         if url in cache:
             record = cache.get(url)
+            page_sanitized = json.loads(json_util.dumps(record))
+            return JsonResponse(page_sanitized)
+
+        # Check url in db
+        # Check if user is trying to convert it into private
+        record = url_collection.find_one({"originalURL": get_domain_name() + request.path[1:]})
+        if record is not None:
             page_sanitized = json.loads(json_util.dumps(record))
             return JsonResponse(page_sanitized)
 
@@ -90,9 +113,10 @@ def generate_short_url(request):
                 future_date_and_time = current_date_and_time + hours_added
 
                 record = {"shortURL": get_domain_name() + tiny_url_path,
-                          "isPrivate": False,
+                          "isPrivate": is_private,
                           "originalURL": url,
                           "creationDate": current_date_and_time,
+                          "allowedUsers": allowed_users,
                           "expirationDate": future_date_and_time}
                 url_collection.insert_one(record)
                 page_sanitized = json.loads(json_util.dumps(record))
@@ -116,36 +140,73 @@ def generate_short_url(request):
         return JsonResponse({"Error": "Cannot create Tiny URL for given URL"})
 
 
-def get_original_url(request):
-    pass
-
-
 @csrf_exempt
 def redirect_url(request):
     try:
         if (get_domain_name() + request.path[1:]) in cache:
             record = cache.get(get_domain_name() + request.path[1:])
-            return redirect(record["originalURL"])
+            if record['isPrivate']:
+                # Check if user is logged in then redirect or throw error
+                username = get_username(request)
+                if username is None:
+                    return JsonResponse({"Error": "Please login the given url is private"})
+                elif username in record['allowedUsers']:
+                    return redirect(record["originalURL"])
+                else:
+                    return JsonResponse({"Error": "You don't have access to given uel"})
+            else:
+                return redirect(record["originalURL"])
         else:
-            urls = url_collection.find({"shortURL": get_domain_name() + request.path[1:]})
-            for url in urls:
-                longURL = url['originalURL']
-                expDate = url['expirationDate']
-                today = datetime.datetime.utcnow()
-                remainingTimeToExp = expDate - today
-                if remainingTimeToExp > 0:
-                    cache_size = cache.dbsize()
-                    if cache_size > 199:
-                        least_recently_used_key = cache.randomkey()
-                        longest_idle = cache.object("idletime", least_recently_used_key)
-                        for key in cache.scan_iter("*"):
-                            idle = cache.object("idletime", key)
-                            if idle > longest_idle:
-                                least_recently_used_key = key
-                                longest_idle = idle
-                        cache.delete(least_recently_used_key)
-                    cache.set(get_domain_name() + request.path[1:], longURL, timeout=remainingTimeToExp.total_seconds())
-                return redirect(longURL)
+            url = url_collection.find_one({"shortURL": get_domain_name() + request.path[1:]})
+            if url is not None:
+                print(url['isPrivate'])
+                if url['isPrivate']:
+                    # Check if user is logged in then add to cache and redirect or throw error
+                    username = get_username(request)
+                    if username is None:
+                        return JsonResponse({"Error": "Please login the given url is private"})
+                    elif username in url['allowedUsers']:
+                        long_url = url['originalURL']
+                        exp_date = url['expirationDate']
+                        today = datetime.datetime.utcnow()
+                        remaining_time_to_exp = exp_date - today
+
+                        if remaining_time_to_exp > 0:
+                            cache_size = cache.dbsize()
+                            if cache_size > 199:
+                                least_recently_used_key = cache.randomkey()
+                                longest_idle = cache.object("idletime", least_recently_used_key)
+                                for key in cache.scan_iter("*"):
+                                    idle = cache.object("idletime", key)
+                                    if idle > longest_idle:
+                                        least_recently_used_key = key
+                                        longest_idle = idle
+                                cache.delete(least_recently_used_key)
+                            cache.set(get_domain_name() + request.path[1:], long_url,
+                                      timeout=remaining_time_to_exp.total_seconds())
+                        return redirect(long_url)
+                    else:
+                        return JsonResponse({"Error": "You don't have access to given uel"})
+                else:
+                    long_url = url['originalURL']
+                    exp_date = url['expirationDate']
+                    today = datetime.datetime.utcnow()
+                    remaining_time_to_exp = exp_date - today
+
+                    if remaining_time_to_exp > 0:
+                        cache_size = cache.dbsize()
+                        if cache_size > 199:
+                            least_recently_used_key = cache.randomkey()
+                            longest_idle = cache.object("idletime", least_recently_used_key)
+                            for key in cache.scan_iter("*"):
+                                idle = cache.object("idletime", key)
+                                if idle > longest_idle:
+                                    least_recently_used_key = key
+                                    longest_idle = idle
+                            cache.delete(least_recently_used_key)
+                        cache.set(get_domain_name() + request.path[1:], long_url,
+                                  timeout=remaining_time_to_exp.total_seconds())
+                    return redirect(long_url)
     except Exception as e:
         return HttpResponse(e)
 
@@ -153,12 +214,9 @@ def redirect_url(request):
 
 
 def delete_url_data(request):
-    # docs = url_collection.find({})
-    # print(docs)
-    # for r in docs:
-    domain = request.build_absolute_uri('/')[:-1]
-    print("****")
-    print(domain)
+    pass
 
-    return HttpResponse(domain)
+
+def get_original_url(request):
+    pass
 

@@ -9,16 +9,14 @@ import json
 from django.shortcuts import redirect
 import re
 from django.core.cache import cache
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-
-CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
+import redis
 
 try:
     connect_string = 'mongodb+srv://mukul:samplepassword@cluster0.2ergm.mongodb.net/test'
     db_client = MongoClient(connect_string)
     dbname = db_client['shortURLDB']
     url_collection = dbname['URL']
+    redis_connection = redis.StrictRedis(host='localhost', port=6379)
 except Exception as error:
     print(error)
 
@@ -54,25 +52,25 @@ def get_username(request):
     return 'admin'
 
 
-
 @csrf_exempt
 def generate_short_url(request):
     if request.method == 'POST':
-        # post_data = json.loads(request.body.decode("utf-8"))
-        url = request.POST.get('url')
+        post_data = json.loads(request.body.decode("utf-8"))
+        url = post_data.get('url')
 
         try:
-            milliseconds_expiration_date_and_time = request.POST.get('expirationDateAndTime')
+            milliseconds_expiration_date_and_time = post_data.get('expirationDateAndTime')
             if milliseconds_expiration_date_and_time is None:
                 milliseconds_expiration_date_and_time = 8.64e+7
         except:
             milliseconds_expiration_date_and_time = 8.64e+7
 
-        is_private = request.POST.get('isPrivate')
+        is_private = post_data.get('isPrivate')
         if is_private is not None or is_private is True:
-            # Remaining add logged in user to it
+            # Check if the user is logged in.
+            # Remaining add logged in user to it.
             # Remanining convert allowed user string to array.
-            allowed_users = request.POST.get('allowedUsers')
+            allowed_users = post_data.get('allowedUsers')
             if allowed_users is None:
                 return JsonResponse({'Error': "Please enter atleast one user"})
         else:
@@ -120,7 +118,8 @@ def generate_short_url(request):
                           "expirationDate": future_date_and_time}
                 url_collection.insert_one(record)
                 page_sanitized = json.loads(json_util.dumps(record))
-                cache_size = cache.dbsize()
+                cache_size = redis_connection.dbsize()
+
                 if cache_size > 198:
                     least_recently_used_key = cache.randomkey()
                     longest_idle = cache.object("idletime", least_recently_used_key)
@@ -149,17 +148,16 @@ def redirect_url(request):
                 # Check if user is logged in then redirect or throw error
                 username = get_username(request)
                 if username is None:
-                    return JsonResponse({"Error": "Please login the given url is private"})
+                    return JsonResponse({"Error": "Please login to access the url"})
                 elif username in record['allowedUsers']:
                     return redirect(record["originalURL"])
                 else:
-                    return JsonResponse({"Error": "You don't have access to given uel"})
+                    return JsonResponse({"Error": "You don't have access to given URL"})
             else:
                 return redirect(record["originalURL"])
         else:
             url = url_collection.find_one({"shortURL": get_domain_name() + request.path[1:]})
             if url is not None:
-                print(url['isPrivate'])
                 if url['isPrivate']:
                     # Check if user is logged in then add to cache and redirect or throw error
                     username = get_username(request)
@@ -172,7 +170,7 @@ def redirect_url(request):
                         remaining_time_to_exp = exp_date - today
 
                         if remaining_time_to_exp > 0:
-                            cache_size = cache.dbsize()
+                            cache_size = redis_connection.dbsize()
                             if cache_size > 199:
                                 least_recently_used_key = cache.randomkey()
                                 longest_idle = cache.object("idletime", least_recently_used_key)
@@ -186,7 +184,7 @@ def redirect_url(request):
                                       timeout=remaining_time_to_exp.total_seconds())
                         return redirect(long_url)
                     else:
-                        return JsonResponse({"Error": "You don't have access to given uel"})
+                        return JsonResponse({"Error": "You don't have access to given URL"})
                 else:
                     long_url = url['originalURL']
                     exp_date = url['expirationDate']
@@ -194,7 +192,7 @@ def redirect_url(request):
                     remaining_time_to_exp = exp_date - today
 
                     if remaining_time_to_exp > 0:
-                        cache_size = cache.dbsize()
+                        cache_size = redis_connection.dbsize()
                         if cache_size > 199:
                             least_recently_used_key = cache.randomkey()
                             longest_idle = cache.object("idletime", least_recently_used_key)

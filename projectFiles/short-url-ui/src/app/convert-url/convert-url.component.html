@@ -1,5 +1,5 @@
 <!-- Top level Navbar -->
-<header class="header-1">
+<header class="header-6">
     <div class="branding">
         <a href="javascript://" class="nav-link">
             <cds-icon shape="vm-bug"></cds-icon>
@@ -25,8 +25,8 @@
             </a>
         </div>
     </ng-template>
-
 </header>
+
 <form class="clr-form clr-form-horizontal" class="bg-img">
     <br><br>
     <div class="alert alert-danger" *ngIf="errorMessage">
@@ -57,6 +57,19 @@
         &nbsp;&nbsp;&nbsp;&nbsp;</label>
     <!-- <input type="text" placeholder="Expiration time (in ms)" name="expirationDateAndTime" [(ngModel)]="expirationDateAndTime" /> -->
     <input type="datetime-local" name="expirationDateAndTime" [(ngModel)]="expirationDateAndTime">
+    <div *ngIf="username" class="flex-container">
+        <clr-toggle-container>
+            <clr-toggle-wrapper>
+                <input type="checkbox" clrToggle name="options" required [(ngModel)]="privateUrl" />
+                <label>Private URL</label>
+            </clr-toggle-wrapper>
+            <clr-control-helper>Make this URL accessible to a set of users defined by you</clr-control-helper>
+        </clr-toggle-container>
+    </div>
+    <br><br>
+    <div *ngIf="privateUrl" class="flex-container">
+        <input class="longUrl" placeholder="Specify user names separated by comma" name="usersString" [(ngModel)]="usersString" />
+    </div>
     <br><br>
     <div *ngIf="shortUrl" class="flex-container">
         <label class="shortURLLabel">Your Short URL: &nbsp;&nbsp;&nbsp;&nbsp; </label>

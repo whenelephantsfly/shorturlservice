@@ -55,11 +55,12 @@ def url_validator(url):
 @csrf_exempt
 def generate_short_url(request):
     if request.method == 'POST':
-        post_data = json.loads(request.body.decode("utf-8"))
-        url = post_data.get('url')
+        # request.POST = json.loads(request.body.decode("utf-8"))
+        url = request.POST.get('url')
+        print(url)
 
         try:
-            milliseconds_expiration_date_and_time = post_data.get('expirationDateAndTime')
+            milliseconds_expiration_date_and_time = request.POST.get('expirationDateAndTime')
         except:
             milliseconds_expiration_date_and_time = 8.64e+7
 

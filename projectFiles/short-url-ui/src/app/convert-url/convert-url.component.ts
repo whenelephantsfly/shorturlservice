@@ -12,6 +12,8 @@ export class ConvertUrlComponent implements OnInit {
   responseData: any = {};
   errorMessage: string = "";
   username: string = "";
+  privateUrl: boolean = false;
+  usersString: string = "";
   // expirationDateAndTime: string = 24 * 60 * 60 * 1000 + "";
   expirationDateAndTime: string = new Date(new Date().getTime() + (24 * 60 * 60 * 1000)).toISOString().slice(0, 16);
 
@@ -35,7 +37,6 @@ export class ConvertUrlComponent implements OnInit {
     let postData = { 
       "url": this.longUrl,
       "expirationDateAndTime": difference
-      // "expirationDateAndTime": parseInt(this.expirationDateAndTime) 
     }
     console.log(postData);
     console.log(difference);
@@ -43,7 +44,7 @@ export class ConvertUrlComponent implements OnInit {
     fetch("/api/generateShortUrl", {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: JSON.stringify(postData)
     }).then(response => response.json())
@@ -69,10 +70,6 @@ export class ConvertUrlComponent implements OnInit {
     selBox.select();
     document.execCommand('copy');
     document.body.removeChild(selBox);
-  }
-
-  changed() {
-    console.log(this.expirationDateAndTime)
   }
 
   logout() {

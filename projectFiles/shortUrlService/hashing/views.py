@@ -77,29 +77,6 @@ def add_to_cache(request, record, key):
         print(error)
 
 
-def generate_short_url_checks(request,url):
-    # Check- Given Url is valid
-    if not url_validator(url):
-        return JsonResponse({"Error": "Given url is not valid"})
-
-    # Check if tinyurl is given
-    if get_domain_name() in url:
-        return JsonResponse({"Error": "Cannot create tiny Url for this domain."})
-
-    # Check url in cache
-    if url in cache:
-        record = cache.get(url)
-        page_sanitized = json.loads(json_util.dumps(record))
-        return JsonResponse(page_sanitized)
-
-    # Check url in db
-    # Check if user is trying to convert it into private
-    record = url_collection.find_one({"originalURL":url})
-    if record is not None:
-        page_sanitized = json.loads(json_util.dumps(record))
-        return JsonResponse(page_sanitized)
-
-
 @csrf_exempt
 def generate_short_url(request):
     if request.method == 'POST':
@@ -119,7 +96,26 @@ def generate_short_url(request):
             is_private = False
             allowed_users = None
 
-        generate_short_url_checks(request, url)
+        # Check- Given Url is valid
+        if not url_validator(url):
+            return JsonResponse({"Error": "Given url is not valid"})
+
+        # Check if tinyurl is given
+        if get_domain_name() in url:
+            return JsonResponse({"Error": "Cannot create tiny Url for this domain."})
+
+        # Check url in cache
+        if url in cache:
+            record = cache.get(url)
+            page_sanitized = json.loads(json_util.dumps(record))
+            return JsonResponse(page_sanitized)
+
+        # Check url in db
+        # Check if user is trying to convert it into private
+        record = url_collection.find_one({"originalURL": url})
+        if record is not None:
+            page_sanitized = json.loads(json_util.dumps(record))
+            return JsonResponse(page_sanitized)
 
         # Converting the URL to 32 bit MD5 hash value.
         key32 = hashlib.md5(url.encode()).hexdigest()

@@ -88,12 +88,14 @@ def generate_short_url(request):
             milliseconds_expiration_date_and_time = 8.64e+7
 
         is_private = post_data.get('isPrivate')
-        if is_private is not None or is_private is True:
-            allowed_users = post_data.get('allowedUsers')
+        if is_private is None:
+            is_private = False
+
+        if is_private is True:
+            allowed_users = str(post_data.get('allowedUsers')).split(',')
             if allowed_users is None:
                 return JsonResponse({'Error': "Please enter atleast one user"})
         else:
-            is_private = False
             allowed_users = None
 
         # Check- Given Url is valid
@@ -188,9 +190,7 @@ def redirect_url(request):
 
 def get_private_urls(request):
     username = request.GET.get('userName')
-    regex_pattern = username + ',|,' + username + ',|,' + username
-    regex = re.compile(regex_pattern, re.I)
-    records = url_collection.find({"allowedUsers": {'$regex': regex}})
+    records = url_collection.find({"allowedUsers": username})
     all_records = []
     for record in records:
         all_records.append(record)

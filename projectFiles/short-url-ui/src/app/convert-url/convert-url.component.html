@@ -88,7 +88,7 @@
     <div class="clr-form-control" *ngIf="shortUrl">
         <label for="shortUrl" class="clr-control-label label-class label-margin">Your Short URL: </label>
         <div class="clr-control-container">
-            <a class="shortURLLabel" [href]="shortUrl" target="_blank">
+            <a class="shortURLLabel" [href]="shortUrl+'?userName='+username" target="_blank">
                 {{shortUrl}}
             </a> &nbsp;&nbsp;
             <button (click)="copyLink()" title="Copy link" class="btn btn-link btn-icon">

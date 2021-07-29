@@ -1,9 +1,9 @@
 .heading {
-    font-size: xx-large;
+    font-size: xxx-large;
     text-align: center;
     font-weight: bolder;
     color: #454545;
-    padding: 1rem;
+    padding-top: 2rem;
 }
 
 .longUrl {
@@ -17,7 +17,12 @@
 }
 
 .form-class {
-    padding: 1rem 3rem;
+    padding: 3rem 8rem;
+}
+
+.output {
+    position: absolute;
+    bottom: 15rem;
 }
 
 .label-class {
@@ -44,10 +49,6 @@
 
 .label-margin {
     margin-top: 0.75rem !important;
-}
-
-.submit-btn {
-    margin-top: 1rem;
 }
 
 .shortURLLabel {

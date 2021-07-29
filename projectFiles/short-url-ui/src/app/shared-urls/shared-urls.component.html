@@ -31,7 +31,7 @@
     <h1>List of shared URLs</h1>
     <ul class="list urls-list">
         <li *ngFor="let url of urls">
-            <a [href]="url.shortURL+'?userName='+username" target="_blank">{{url.shortURL}}</a>
+            <a [href]="url.shortURL+'?userName='+username" target="_blank">{{url.shortURL}}</a> - shared by {{url.allowedUsers[0]}}
         </li>
     </ul>
 </div>

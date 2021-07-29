@@ -36,7 +36,7 @@ export class ConvertUrlComponent implements OnInit {
       "url": this.longUrl,
       "expirationDateAndTime": difference,
       "isPrivate": this.privateUrl,
-      "allowedUsers": this.username + ',' + this.usersString
+      "allowedUsers": this.privateUrl ? this.username + ',' + this.usersString : ''
     }
     
     fetch("/api/generateShortUrl" + (this.username ? "?userName=" + this.username : ""), {

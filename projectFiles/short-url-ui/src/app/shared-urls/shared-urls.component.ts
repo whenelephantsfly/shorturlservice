@@ -18,6 +18,11 @@ export class SharedUrlsComponent implements OnInit {
   ngOnInit(): void {
     if(localStorage.getItem("username")) {
       this.username = <string> localStorage.getItem("username");
+      fetch('/api/getPrivateUrls?userName=' + this.username)
+        .then(response => response.json())
+        .then(data => {
+          this.urls = data;
+        })
     } else {
       this.router.navigate(['/']);
     }

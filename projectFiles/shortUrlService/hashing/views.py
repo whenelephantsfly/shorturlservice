@@ -61,7 +61,7 @@ def add_to_cache(request, record, key):
         exp_date = record['expirationDate']
         today = datetime.datetime.utcnow()
         remaining_time_to_exp = exp_date - today
-        if remaining_time_to_exp > 0:
+        if remaining_time_to_exp.total_seconds() > 0:
             cache_size = redis_connection.dbsize()
             if cache_size > 199:
                 least_recently_used_key = cache.randomkey()
@@ -94,7 +94,7 @@ def generate_short_url_checks(request,url):
 
     # Check url in db
     # Check if user is trying to convert it into private
-    record = url_collection.find_one({"originalURL": get_domain_name() + request.path[1:]})
+    record = url_collection.find_one({"originalURL":url})
     if record is not None:
         page_sanitized = json.loads(json_util.dumps(record))
         return JsonResponse(page_sanitized)
@@ -112,9 +112,6 @@ def generate_short_url(request):
 
         is_private = post_data.get('isPrivate')
         if is_private is not None or is_private is True:
-            # Check if the user is logged in.
-            # Remaining add logged in user to it.
-            # Remanining convert allowed user string to array.
             allowed_users = post_data.get('allowedUsers')
             if allowed_users is None:
                 return JsonResponse({'Error': "Please enter atleast one user"})

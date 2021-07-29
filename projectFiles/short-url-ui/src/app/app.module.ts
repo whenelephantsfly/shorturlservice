@@ -11,6 +11,7 @@ import { ConvertUrlComponent } from './convert-url/convert-url.component';
 import { AllUrlsComponent } from './all-urls/all-urls.component';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SharedUrlsComponent } from './shared-urls/shared-urls.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     ConvertUrlComponent,
     AllUrlsComponent,
     SignupComponent,
+    SharedUrlsComponent,
    
   ],
   imports: [

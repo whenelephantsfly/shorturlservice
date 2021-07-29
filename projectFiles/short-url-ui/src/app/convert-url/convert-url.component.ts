@@ -27,7 +27,6 @@ export class ConvertUrlComponent implements OnInit {
 
   get isValidUrl() {
     return this.longUrl.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&=]*)/g);
-    return true
   }
 
   onSubmit() {
@@ -36,7 +35,9 @@ export class ConvertUrlComponent implements OnInit {
 
     let postData = { 
       "url": this.longUrl,
-      "expirationDateAndTime": difference
+      "expirationDateAndTime": difference,
+      "isPrivate": this.privateUrl,
+      "allowedUsers": this.usersString
     }
     console.log(postData);
     console.log(difference);
@@ -44,7 +45,8 @@ export class ConvertUrlComponent implements OnInit {
     fetch("/api/generateShortUrl", {
       method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Token ${localStorage.getItem('token')}`
       },
       body: JSON.stringify(postData)
     }).then(response => response.json())

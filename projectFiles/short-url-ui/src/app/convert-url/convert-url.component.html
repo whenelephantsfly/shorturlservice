@@ -1,5 +1,5 @@
 <!-- Top level Navbar -->
-<header class="header-1">
+<header class="header-6">
     <div class="branding">
         <a href="javascript://" class="nav-link">
             <cds-icon shape="vm-bug"></cds-icon>
@@ -8,6 +8,7 @@
     </div>
     <div class="header-nav">
         <a routerLink="/" [routerLinkActiveOptions]="{exact: true}" class="nav-link nav-text" routerLinkActive="active">Dashboard</a>
+        <a *ngIf="username" routerLink="/shared" class="nav-link nav-text" routerLinkActive="active">Shared with me</a>
         <!-- <a routerLink="/login" class="nav-link nav-text" routerLinkActive="active">Login</a>
      -->
     </div>
@@ -25,9 +26,76 @@
             </a>
         </div>
     </ng-template>
-
 </header>
-<form class="clr-form clr-form-horizontal" class="bg-img">
+
+<h1>Shorten a URL</h1>
+
+<div class="alert alert-danger" *ngIf="errorMessage">
+    <div class="alert-items">
+        <div class="alert-item static">
+            <div class="alert-icon-wrapper">
+                <cds-icon class="alert-icon" shape="exclamation-circle"></cds-icon>
+            </div>
+            <span class="alert-text">
+                {{errorMessage}}
+            </span>
+        </div>
+    </div>
+</div>
+
+<form class="clr-form clr-form-horizontal">
+    <div class="clr-form-control">
+        <label for="longUrl" class="clr-control-label">Long URL: </label>
+        <div class="clr-control-container">
+            <div class="clr-input-wrapper">
+                <input type="text" name="longUrl" placeholder="Paste a URL" class="clr-input" [(ngModel)]="longUrl" />
+            </div>
+        </div>
+    </div>
+    <div class="clr-form-control">
+        <label for="expirationDateAndTime" class="clr-control-label">Expiration Time (default: 24 hours): </label>
+        <div class="clr-control-container">
+            <div class="clr-input-wrapper">
+                <input type="datetime-local" name="expirationDateAndTime" [(ngModel)]="expirationDateAndTime">
+            </div>
+        </div>
+    </div>
+    <div class="clr-form-control" *ngIf="username">
+        <label for="privateUrl" class="clr-control-label">Private URL: </label>
+        <div class="clr-control-container">
+            <input type="checkbox" name="privateUrl" required [(ngModel)]="privateUrl" />
+        </div>
+    </div>
+    <div class="clr-form-control" *ngIf="privateUrl">
+        <label for="expirationDateAndTime" class="clr-control-label">Allowed Users (comma separated): </label>
+        <div class="clr-control-container">
+            <div class="clr-input-wrapper">
+                <input type="text" name="usersString" placeholder="Add user names" class="clr-input" [(ngModel)]="usersString" />
+            </div>
+        </div>
+    </div>
+
+    <button (click)="onSubmit()" [disabled]="!isValidUrl" class="btn btn-lg btn-primary tooltip tooltip-xs">
+        Short URL
+        <span *ngIf="!isValidUrl" class="tooltip-content">Not a valid URL</span>
+    </button>
+
+    <div class="clr-form-control" *ngIf="shortUrl">
+        <label for="shortUrl" class="clr-control-label">Your Short URL: </label>
+        <div class="clr-control-container">
+            <a class="shortURLLabel" [href]="shortUrl" target="_blank">
+                {{shortUrl}}
+            </a> &nbsp;&nbsp;
+            <button (click)="copyLink()" title="Copy link" class="btn btn-link btn-icon">
+                <cds-icon size="md" shape="copy"></cds-icon>
+            </button>
+        </div>
+    </div>
+    
+</form>
+
+
+<!-- <form class="clr-form clr-form-horizontal" class="bg-img">
     <br><br>
     <div class="alert alert-danger" *ngIf="errorMessage">
         <div class="alert-items">
@@ -54,9 +122,22 @@
     </div>
     <br>
     <label class="shortURLLabel" for="expirationDateAndTime">Expiration time (default: 24 hours):
-        &nbsp;&nbsp;&nbsp;&nbsp;</label>
+        &nbsp;&nbsp;&nbsp;&nbsp;</label> -->
     <!-- <input type="text" placeholder="Expiration time (in ms)" name="expirationDateAndTime" [(ngModel)]="expirationDateAndTime" /> -->
-    <input type="datetime-local" name="expirationDateAndTime" [(ngModel)]="expirationDateAndTime">
+    <!-- <input type="datetime-local" name="expirationDateAndTime" [(ngModel)]="expirationDateAndTime">
+    <div *ngIf="username" class="flex-container">
+        <clr-toggle-container>
+            <clr-toggle-wrapper>
+                <input type="checkbox" clrToggle name="options" required [(ngModel)]="privateUrl" />
+                <label>Private URL</label>
+            </clr-toggle-wrapper>
+            <clr-control-helper>Make this URL accessible to a set of users defined by you</clr-control-helper>
+        </clr-toggle-container>
+    </div>
+    <br><br>
+    <div *ngIf="privateUrl" class="flex-container">
+        <input class="longUrl" placeholder="Specify user names separated by comma" name="usersString" [(ngModel)]="usersString" />
+    </div>
     <br><br>
     <div *ngIf="shortUrl" class="flex-container">
         <label class="shortURLLabel">Your Short URL: &nbsp;&nbsp;&nbsp;&nbsp; </label>
@@ -68,4 +149,4 @@
         </button>
     </div>
     <br><br><br><br>
-</form>
+</form> -->

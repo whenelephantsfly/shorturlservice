@@ -26,7 +26,6 @@ export class LoginComponent implements OnInit {
   
   onSubmit()
   {
-    console.log(this.userlogin.value);
     fetch('/api/api/login/', {
       method: "POST",
       headers: {
@@ -41,7 +40,6 @@ export class LoginComponent implements OnInit {
       if(data.non_field_errors) this.errorMessage = data.non_field_errors;
       else {
         this.errorMessage = "";
-        console.log(data);
         localStorage.setItem("username", this.userlogin.value.username);
         localStorage.setItem("token", data.token);
         this.router.navigate(['/']);

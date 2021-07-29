@@ -14,7 +14,6 @@ export class ConvertUrlComponent implements OnInit {
   username: string = "";
   privateUrl: boolean = false;
   usersString: string = "";
-  // expirationDateAndTime: string = 24 * 60 * 60 * 1000 + "";
   expirationDateAndTime: string = new Date(new Date().getTime() + (24 * 60 * 60 * 1000)).toISOString().slice(0, 16);
 
   constructor() { }
@@ -37,12 +36,10 @@ export class ConvertUrlComponent implements OnInit {
       "url": this.longUrl,
       "expirationDateAndTime": difference,
       "isPrivate": this.privateUrl,
-      "allowedUsers": this.usersString
+      "allowedUsers": this.username + ',' + this.usersString
     }
-    console.log(postData);
-    console.log(difference);
-    console.log(this.expirationDateAndTime)
-    fetch("/api/generateShortUrl", {
+    
+    fetch("/api/generateShortUrl" + (this.username ? "?userName=" + this.username : ""), {
       method: "POST",
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -55,7 +52,6 @@ export class ConvertUrlComponent implements OnInit {
         if(this.responseData.Error) this.errorMessage = this.responseData.Error;
         else this.errorMessage = "";
         this.shortUrl = this.responseData.shortURL;
-        console.log(this.responseData);
       })
       .catch(e => console.error(e));
   }

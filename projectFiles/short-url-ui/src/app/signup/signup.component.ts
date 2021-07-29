@@ -56,10 +56,7 @@ export class SignupComponent implements OnInit {
     }
   }
 
-
-
   onSubmit(){
-    console.log(this.usersignup.value);
     fetch('/api/api/register/', {
       method: "POST",
       headers: {
@@ -75,7 +72,6 @@ export class SignupComponent implements OnInit {
       if(data.non_field_errors) this.errorMessage = data.non_field_errors;
       else {
         this.errorMessage = "";
-        console.log(data);
         localStorage.setItem("username", this.usersignup.value.username);
         localStorage.setItem("token", data.token);
         this.router.navigate(['/']);

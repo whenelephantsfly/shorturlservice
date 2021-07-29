@@ -43,45 +43,49 @@
     </div>
 </div>
 
-<form class="clr-form clr-form-horizontal">
+<form class="clr-form clr-form-horizontal form-class">
     <div class="clr-form-control">
-        <label for="longUrl" class="clr-control-label">Long URL: </label>
+        <label for="longUrl" class="clr-control-label label-class">Long URL : </label>
         <div class="clr-control-container">
-            <div class="clr-input-wrapper">
-                <input type="text" name="longUrl" placeholder="Paste a URL" class="clr-input" [(ngModel)]="longUrl" />
+            <div class="clr-input-wrapper tooltip tooltip-md">
+                <input type="text" name="longUrl" placeholder="Paste a URL" size="150" class="clr-input" [(ngModel)]="longUrl" />
+                <span *ngIf="!isValidUrl" class="tooltip-content">Not a valid URL</span>
             </div>
         </div>
     </div>
     <div class="clr-form-control">
-        <label for="expirationDateAndTime" class="clr-control-label">Expiration Time (default: 24 hours): </label>
+        <label for="expirationDateAndTime" class="clr-control-label label-class">Expiration Time : </label>
         <div class="clr-control-container">
             <div class="clr-input-wrapper">
                 <input type="datetime-local" name="expirationDateAndTime" [(ngModel)]="expirationDateAndTime">
+                <span class="helper-text">(Default expiration time is 24 hours)</span>
             </div>
         </div>
     </div>
     <div class="clr-form-control" *ngIf="username">
-        <label for="privateUrl" class="clr-control-label">Private URL: </label>
-        <div class="clr-control-container">
-            <input type="checkbox" name="privateUrl" required [(ngModel)]="privateUrl" />
-        </div>
+        <label for="privateUrl" class="clr-control-label label-class">Private URL : </label>
+            <clr-toggle-container>
+                <clr-toggle-wrapper>
+                  <input type="checkbox" clrToggle name="privateUrl" required [(ngModel)]="privateUrl" />
+                  <label class="helper-text">(Default short url generated is public url, to make it private toggle on)</label>
+                </clr-toggle-wrapper>
+              </clr-toggle-container>
     </div>
     <div class="clr-form-control" *ngIf="privateUrl">
-        <label for="expirationDateAndTime" class="clr-control-label">Allowed Users (comma separated): </label>
+        <label for="expirationDateAndTime" class="clr-control-label label-class">Allowed Users : </label>
         <div class="clr-control-container">
             <div class="clr-input-wrapper">
-                <input type="text" name="usersString" placeholder="Add user names" class="clr-input" [(ngModel)]="usersString" />
+                <input type="text" name="usersString" placeholder="Add user names separated by commas. For example: user1,user2,..." size="150" class="clr-input" [(ngModel)]="usersString" />
             </div>
         </div>
     </div>
 
-    <button (click)="onSubmit()" [disabled]="!isValidUrl" class="btn btn-lg btn-primary tooltip tooltip-xs">
+    <button (click)="onSubmit()" [disabled]="!isValidUrl" class="submit-btn btn btn-lg btn-primary">
         Short URL
-        <span *ngIf="!isValidUrl" class="tooltip-content">Not a valid URL</span>
     </button>
 
     <div class="clr-form-control" *ngIf="shortUrl">
-        <label for="shortUrl" class="clr-control-label">Your Short URL: </label>
+        <label for="shortUrl" class="clr-control-label label-class label-margin">Your Short URL: </label>
         <div class="clr-control-container">
             <a class="shortURLLabel" [href]="shortUrl" target="_blank">
                 {{shortUrl}}

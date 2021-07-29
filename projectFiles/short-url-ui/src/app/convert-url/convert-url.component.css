@@ -13,12 +13,36 @@ h1 {
     justify-content: center;
 }
 
+.form-class {
+    padding: 1rem 3rem;
+}
+
+.label-class {
+    font-size: x-large;
+    width: 15rem !important;
+} 
+
+.helper-text {
+    margin-left: 1rem;
+    font-size: large;
+    color: #454545;
+}
+
+.clr-toggle-wrapper {
+    margin-left: 1rem;
+    margin-top: -1rem;
+}
+
 .bg-img {
     text-align: center;
 }
 
-.btn {
-    margin: 0rem;
+.label-margin {
+    margin-top: 0.75rem !important;
+}
+
+.submit-btn {
+    margin-top: 1rem;
 }
 
 .shortURLLabel {

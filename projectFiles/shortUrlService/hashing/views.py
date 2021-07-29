@@ -48,8 +48,12 @@ def url_validator(url):
 
 
 def get_username(request):
-    # return None if not logged in
-    return 'admin'
+    try:
+        username = request.GET.get('userName')
+    except Exception as Error:
+        username = None
+        print(Error)
+    return username
 
 
 def add_to_cache(request, record, key):
@@ -189,10 +193,22 @@ def redirect_url(request):
     return HttpResponse("Given url does not exist")
 
 
+def get_private_urls(request):
+    username = request.GET.get('userName')
+    regex_pattern = username + ',|,' + username + ',|,' + username
+    regex = re.compile(regex_pattern, re.I)
+    records = url_collection.find({"allowedUsers": {'$regex': regex}})
+    all_records = []
+    for record in records:
+        all_records.append(record)
+
+    page_sanitized = json.loads(json_util.dumps(all_records))
+    return JsonResponse(page_sanitized, safe=False)
+
+
 def delete_url_data(request):
     pass
 
 
 def get_original_url(request):
     pass
-

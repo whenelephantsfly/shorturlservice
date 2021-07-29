@@ -48,8 +48,56 @@ def url_validator(url):
 
 
 def get_username(request):
-    # return None if not logged in
-    return 'admin'
+    try:
+        username = request.GET.get('userName')
+    except Exception as Error:
+        username = None
+        print(Error)
+    return username
+
+
+def add_to_cache(request, record, key):
+    try:
+        exp_date = record['expirationDate']
+        today = datetime.datetime.utcnow()
+        remaining_time_to_exp = exp_date - today
+        if remaining_time_to_exp > 0:
+            cache_size = redis_connection.dbsize()
+            if cache_size > 199:
+                least_recently_used_key = cache.randomkey()
+                longest_idle = cache.object("idletime", least_recently_used_key)
+                for key in cache.scan_iter("*"):
+                    idle = cache.object("idletime", key)
+                    if idle > longest_idle:
+                        least_recently_used_key = key
+                        longest_idle = idle
+                cache.delete(least_recently_used_key)
+            cache.set(key, record, timeout=remaining_time_to_exp.total_seconds())
+    except Exception as error:
+        print(error)
+
+
+def generate_short_url_checks(request,url):
+    # Check- Given Url is valid
+    if not url_validator(url):
+        return JsonResponse({"Error": "Given url is not valid"})
+
+    # Check if tinyurl is given
+    if get_domain_name() in url:
+        return JsonResponse({"Error": "Cannot create tiny Url for this domain."})
+
+    # Check url in cache
+    if url in cache:
+        record = cache.get(url)
+        page_sanitized = json.loads(json_util.dumps(record))
+        return JsonResponse(page_sanitized)
+
+    # Check url in db
+    # Check if user is trying to convert it into private
+    record = url_collection.find_one({"originalURL": get_domain_name() + request.path[1:]})
+    if record is not None:
+        page_sanitized = json.loads(json_util.dumps(record))
+        return JsonResponse(page_sanitized)
 
 
 @csrf_exempt
@@ -58,11 +106,8 @@ def generate_short_url(request):
         post_data = json.loads(request.body.decode("utf-8"))
         url = post_data.get('url')
 
-        try:
-            milliseconds_expiration_date_and_time = post_data.get('expirationDateAndTime')
-            if milliseconds_expiration_date_and_time is None:
-                milliseconds_expiration_date_and_time = 8.64e+7
-        except:
+        milliseconds_expiration_date_and_time = post_data.get('expirationDateAndTime')
+        if milliseconds_expiration_date_and_time is None:
             milliseconds_expiration_date_and_time = 8.64e+7
 
         is_private = post_data.get('isPrivate')
@@ -77,26 +122,7 @@ def generate_short_url(request):
             is_private = False
             allowed_users = None
 
-        # Check- Given Url is valid
-        if not url_validator(url):
-            return JsonResponse({"Error": "Given url is not valid"})
-
-        # Check if tinyurl is given
-        if get_domain_name() in url:
-            return JsonResponse({"Error": "Cannot create tiny Url for this domain."})
-
-        # Check url in cache
-        if url in cache:
-            record = cache.get(url)
-            page_sanitized = json.loads(json_util.dumps(record))
-            return JsonResponse(page_sanitized)
-
-        # Check url in db
-        # Check if user is trying to convert it into private
-        record = url_collection.find_one({"originalURL": get_domain_name() + request.path[1:]})
-        if record is not None:
-            page_sanitized = json.loads(json_util.dumps(record))
-            return JsonResponse(page_sanitized)
+        generate_short_url_checks(request, url)
 
         # Converting the URL to 32 bit MD5 hash value.
         key32 = hashlib.md5(url.encode()).hexdigest()
@@ -118,20 +144,8 @@ def generate_short_url(request):
                           "expirationDate": future_date_and_time}
                 url_collection.insert_one(record)
                 page_sanitized = json.loads(json_util.dumps(record))
-                cache_size = redis_connection.dbsize()
-
-                if cache_size > 198:
-                    least_recently_used_key = cache.randomkey()
-                    longest_idle = cache.object("idletime", least_recently_used_key)
-                    for key in cache.scan_iter("*"):
-                        idle = cache.object("idletime", key)
-                        if idle > longest_idle:
-                            least_recently_used_key = key
-                            longest_idle = idle
-                    cache.delete(least_recently_used_key)
-
-                cache.set(url, record, timeout = milliseconds_expiration_date_and_time / 1000)
-                cache.set(get_domain_name() + tiny_url_path, record, timeout = milliseconds_expiration_date_and_time / 1000)
+                add_to_cache(request, record, url)
+                add_to_cache(request, record, get_domain_name() + tiny_url_path)
                 return JsonResponse(page_sanitized)
             else:
                 tiny_url_path = key32[(i + 1): (i + 8)]
@@ -141,9 +155,11 @@ def generate_short_url(request):
 
 @csrf_exempt
 def redirect_url(request):
+    # Modify token and shortURL
     try:
-        if (get_domain_name() + request.path[1:]) in cache:
-            record = cache.get(get_domain_name() + request.path[1:])
+        short_url = get_domain_name() + request.path[1:]
+        if short_url in cache:
+            record = cache.get(short_url)
             if record['isPrivate']:
                 # Check if user is logged in then redirect or throw error
                 username = get_username(request)
@@ -156,59 +172,38 @@ def redirect_url(request):
             else:
                 return redirect(record["originalURL"])
         else:
-            url = url_collection.find_one({"shortURL": get_domain_name() + request.path[1:]})
-            if url is not None:
-                if url['isPrivate']:
+            record = url_collection.find_one({"shortURL": short_url})
+            if record is not None:
+                if record['isPrivate']:
                     # Check if user is logged in then add to cache and redirect or throw error
                     username = get_username(request)
                     if username is None:
                         return JsonResponse({"Error": "Please login the given url is private"})
-                    elif username in url['allowedUsers']:
-                        long_url = url['originalURL']
-                        exp_date = url['expirationDate']
-                        today = datetime.datetime.utcnow()
-                        remaining_time_to_exp = exp_date - today
-
-                        if remaining_time_to_exp > 0:
-                            cache_size = redis_connection.dbsize()
-                            if cache_size > 199:
-                                least_recently_used_key = cache.randomkey()
-                                longest_idle = cache.object("idletime", least_recently_used_key)
-                                for key in cache.scan_iter("*"):
-                                    idle = cache.object("idletime", key)
-                                    if idle > longest_idle:
-                                        least_recently_used_key = key
-                                        longest_idle = idle
-                                cache.delete(least_recently_used_key)
-                            cache.set(get_domain_name() + request.path[1:], long_url,
-                                      timeout=remaining_time_to_exp.total_seconds())
-                        return redirect(long_url)
+                    elif username in record['allowedUsers']:
+                        add_to_cache(request, record, short_url)
+                        return redirect(record['originalURL'])
                     else:
                         return JsonResponse({"Error": "You don't have access to given URL"})
                 else:
-                    long_url = url['originalURL']
-                    exp_date = url['expirationDate']
-                    today = datetime.datetime.utcnow()
-                    remaining_time_to_exp = exp_date - today
-
-                    if remaining_time_to_exp > 0:
-                        cache_size = redis_connection.dbsize()
-                        if cache_size > 199:
-                            least_recently_used_key = cache.randomkey()
-                            longest_idle = cache.object("idletime", least_recently_used_key)
-                            for key in cache.scan_iter("*"):
-                                idle = cache.object("idletime", key)
-                                if idle > longest_idle:
-                                    least_recently_used_key = key
-                                    longest_idle = idle
-                            cache.delete(least_recently_used_key)
-                        cache.set(get_domain_name() + request.path[1:], long_url,
-                                  timeout=remaining_time_to_exp.total_seconds())
-                    return redirect(long_url)
+                    add_to_cache(request, record, short_url)
+                    return redirect(record['originalURL'])
     except Exception as e:
         return HttpResponse(e)
 
     return HttpResponse("Given url does not exist")
+
+
+def get_private_urls(request):
+    username = request.GET.get('userName')
+    regex_pattern = username + ',|,' + username + ',|,' + username
+    regex = re.compile(regex_pattern, re.I)
+    records = url_collection.find({"allowedUsers": {'$regex': regex}})
+    all_records = []
+    for record in records:
+        all_records.append(record)
+
+    page_sanitized = json.loads(json_util.dumps(all_records))
+    return JsonResponse(page_sanitized, safe=False)
 
 
 def delete_url_data(request):
@@ -217,4 +212,3 @@ def delete_url_data(request):
 
 def get_original_url(request):
     pass
-
